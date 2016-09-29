@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:29:47
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 02:21:47
 main.asm						     Page 1 - 1
 
 
@@ -15,8 +15,13 @@ main.asm						     Page 1 - 1
 
  00000000			.DATA
 
-					; We will be using DWORDS, because scores of more than 65535 seem reasonable,
-					; and scores of more than 4294967295 do not.
+					; The purpose of this program is to find the weighted average of 4 grades,
+					; each with an independent weight.
+
+					; We will be using DWORDS, because scores of more than 65535 (2^16 - 1) seem reasonable,
+					; and scores of more than 4294967295 (2^32 - 1) do not.
+					; We will treat all values as unsigned integers, because this problem does not involve
+					; any negative numbers.
 					
  00000000 00000000			grade1			DWORD	0
  00000004 00000000			grade2			DWORD	0
@@ -28,10 +33,17 @@ main.asm						     Page 1 - 1
  00000018 00000000			weight3			DWORD	0
  0000001C 00000000			weight4			DWORD	0
 					
- 00000020 00000000			weightedGrade1	DWORD	0
- 00000024 00000000			weightedGrade2	DWORD	0
- 00000028 00000000			weightedGrade3	DWORD	0
- 0000002C 00000000			weightedGrade4	DWORD	0
+ 00000020 00000000			weightedGrade1	DWORD	0	; = grade1 * weight1
+ 00000024 00000000			weightedGrade2	DWORD	0	; = grade2 * weight2
+ 00000028 00000000			weightedGrade3	DWORD	0	; = grade3 * weight3
+ 0000002C 00000000			weightedGrade4	DWORD	0	; = grade4 * weight4
+
+ 00000030 00000000			weightedSum		DWORD	0	; = weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
+
+ 00000034 00000000			sumOfWeights	DWORD	0	; = weight1 + weight2 = weight3 + weight4
+
+					; FINAL RESULT
+ 00000038 00000000			weightedAverage	DWORD	0	; = weightedSum / sumOfWeights
 
 
 					; The input macro expects a C-string (null terminated string) to display as a prompt.
@@ -47,19 +59,19 @@ main.asm						     Page 1 - 1
 					; "Weight 3:"
 					; depending on the iteration.
 
- 00000030 47 72 61 64 65		gradePrompt		BYTE	"Grade "	; Stays constant
+ 0000003C 47 72 61 64 65		gradePrompt		BYTE	"Grade "	; Stays constant
 	   20
- 00000036 58				gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
- 00000037  3A 00							BYTE	":", 0		; Stays constant - null terminated
+ 00000042 58				gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
+ 00000043  3A 00							BYTE	":", 0		; Stays constant - null terminated
 
- 00000039 57 65 69 67 68		weightPrompt	BYTE	"Weight "	; Stays constant
+ 00000045 57 65 69 67 68		weightPrompt	BYTE	"Weight "	; Stays constant
 	   74 20
- 00000040 58				weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
- 00000041  3A 00							BYTE	":", 0		; Stays constant - null terminated
+ 0000004C 58				weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
+ 0000004D  3A 00							BYTE	":", 0		; Stays constant - null terminated
 
 					; The input macro needs a 40 character string to store data in
 
- 00000043  00000028 [			string			BYTE	40	DUP	(0)
+ 0000004F  00000028 [			string			BYTE	40	DUP	(0)
 	    00
 	   ]
 					
@@ -69,76 +81,109 @@ main.asm						     Page 1 - 1
 					
 					; Get grade1 and weight1
 
- 00000000  C6 05 00000036 R		mov		gradeNumber,	"1"			; Set gradePrompt to "Grade 1:"
+ 00000000  C6 05 00000042 R		mov		gradeNumber,		"1"			; Set gradePrompt to "Grade 1:"
 	   31
- 00000007  C6 05 00000040 R		mov		weightNumber,	"1"			; Set weightPrompt to "Weight 1:"
+ 00000007  C6 05 0000004C R		mov		weightNumber,		"1"			; Set weightPrompt to "Weight 1:"
 	   31
 
-					input	gradePrompt,	string,	40	; Display prompt, string := user input (as string)
-					atod	string						; EAX := user input (as integer)
- 0000003B  A3 00000000 R		mov		grade1,			eax			; grade1 := EAX
+					input	gradePrompt,		string,	40	; Display prompt, string := user input (as string)
+					atod	string							; EAX := user input (as integer)
+ 0000003B  A3 00000000 R		mov		grade1,				eax			; grade1 := EAX
 
-					input	weightPrompt,	string, 40
+					input	weightPrompt,		string, 40
 					atod	string
- 0000006D  A3 00000010 R		mov		weight1,		eax			; weight1 := user input (as integer)
+ 0000006D  A3 00000010 R		mov		weight1,			eax			; weight1 := user input (as integer)
 
 					; Repeat the same steps as above for grades 2, 3 and 4
 
 					; Get grade2 and weight2
 
- 00000072  C6 05 00000036 R		mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
+ 00000072  C6 05 00000042 R		mov		gradeNumber,		"2"			; Set prompt to "Grade 2:"
 	   32
- 00000079  C6 05 00000040 R		mov		weightNumber,	"2"			; Set weightPrompt to "Weight 2:"
+ 00000079  C6 05 0000004C R		mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 	   32
 														
-					input	gradePrompt,	string,	40
+					input	gradePrompt,		string,	40
 					atod	string
- 000000AD  A3 00000004 R		mov		grade2,			eax
+ 000000AD  A3 00000004 R		mov		grade2,				eax
 
-					input	weightPrompt,	string, 40
+					input	weightPrompt,		string, 40
 					atod	string
- 000000DF  A3 00000014 R		mov		weight2,		eax
+ 000000DF  A3 00000014 R		mov		weight2,			eax
 
 					; Get grade3 and weight3
 
- 000000E4  C6 05 00000036 R		mov		gradeNumber,	"3"
+ 000000E4  C6 05 00000042 R		mov		gradeNumber,		"3"
 	   33
- 000000EB  C6 05 00000040 R		mov		weightNumber,	"3"
+ 000000EB  C6 05 0000004C R		mov		weightNumber,		"3"
 	   33
 
-					input	gradePrompt,	string,	40
+					input	gradePrompt,		string,	40
 					atod	string
- 0000011F  A3 00000008 R		mov		grade3,			eax
+ 0000011F  A3 00000008 R		mov		grade3,				eax
 
-					input	weightPrompt,	string, 40
+					input	weightPrompt,		string, 40
 					atod	string
- 00000151  A3 00000018 R		mov		weight3,		eax
+ 00000151  A3 00000018 R		mov		weight3,			eax
 					
 					; Get grade4 and weight4
 
- 00000156  C6 05 00000036 R		mov		gradeNumber,	"4"
+ 00000156  C6 05 00000042 R		mov		gradeNumber,		"4"
 	   34
- 0000015D  C6 05 00000040 R		mov		weightNumber,	"4"
+ 0000015D  C6 05 0000004C R		mov		weightNumber,		"4"
 	   34
 
-					input	gradePrompt,	string,	40
+					input	gradePrompt,		string,	40
 					atod	string
- 00000191  A3 0000000C R		mov		grade4,			eax
+ 00000191  A3 0000000C R		mov		grade4,				eax
 
-					input	weightPrompt,	string,	40
+					input	weightPrompt,		string,	40
 					atod	string
  000001C3  A3 0000001C R		mov		weight4,			eax
 
 					; Do the math!
 
-					; TODO
+ 000001C8  A1 00000000 R		mov		eax,				grade1
+ 000001CD  F7 25 00000010 R		mul		weight1
+ 000001D3  A3 00000020 R		mov		weightedGrade1,		eax				; weightedGrade1 := grade1 * weight1
 
- 000001C8  B8 00000000			mov		eax,			0			; exit with return code 0
- 000001CD  C3				ret
- 000001CE			_MainProc ENDP
+ 000001D8  A1 00000004 R		mov		eax,				grade2
+ 000001DD  F7 25 00000014 R		mul		weight2
+ 000001E3  A3 00000024 R		mov		weightedGrade2,	 eax				; weightedGrade2 := grade2 * weight2
+
+ 000001E8  A1 00000008 R		mov		eax,				grade3
+ 000001ED  F7 25 00000018 R		mul		weight3
+ 000001F3  A3 00000028 R		mov		weightedGrade3,		eax				; weightedGrade3 := grade3 * weight3
+
+ 000001F8  A1 0000000C R		mov		eax,				grade4
+ 000001FD  F7 25 0000001C R		mul		weight4
+ 00000203  A3 0000002C R		mov		weightedGrade4,		eax				; weightedGrade4 := grade4 * weight4
+
+ 00000208  A1 00000020 R		mov		eax,				weightedGrade1	; EAX := weightedGrade1
+ 0000020D  03 05 00000024 R		add		eax,				weightedGrade2	; EAX := weightedGrade1 + weightedGrade2
+ 00000213  03 05 00000028 R		add		eax,				weightedGrade3	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3
+ 00000219  03 05 0000002C R		add		eax,				weightedGrade4	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
+ 0000021F  A3 00000030 R		mov		weightedSum,		eax				; weightedSum := EAX
+
+ 00000224  A1 00000010 R		mov		eax,				weight1			; EAX := weight1
+ 00000229  03 05 00000014 R		add		eax,				weight2			; EAX := weight1 + weight2
+ 0000022F  03 05 00000018 R		add		eax,				weight3			; EAX := weight1 + weight2 + weight3
+ 00000235  03 05 0000001C R		add		eax,				weight4			; EAX := weight1 + weight2 + weight3 + weight4
+ 0000023B  A3 00000034 R		mov		sumOfWeights,		eax				; sumOfWeights := EAX
+
+					; Division by a DWORD requires the dividend to be stored in EDX:EAX
+ 00000240  BA 00000000			mov		edx,				0				; EDX := 0 (our dividend is only 32 bits - only the lower order bits are used)
+ 00000245  A1 00000030 R		mov		eax,				weightedSum		; EAX := weightedSum
+ 0000024A  F7 35 00000034 R		div		sumOfWeights						; EAX := weightedSum / sumOfWeights
+ 00000250  A3 00000038 R		mov		weightedAverage,	eax				; weightedAverage := EAX
+
+ 00000255  B8 00000000			mov		eax,				0				; exit with return code 0
+					
+ 0000025A  C3				ret
+ 0000025B			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:29:47
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 02:21:47
 main.asm						     Symbols 2 - 1
 
 
@@ -162,15 +207,15 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 0000006B Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000001CE Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000077 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000025B Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
-_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000001CE Public
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000025B Public
 
 
 Symbols:
@@ -195,19 +240,22 @@ grade1 . . . . . . . . . . . . .	DWord	 00000000 _DATA
 grade2 . . . . . . . . . . . . .	DWord	 00000004 _DATA	
 grade3 . . . . . . . . . . . . .	DWord	 00000008 _DATA	
 grade4 . . . . . . . . . . . . .	DWord	 0000000C _DATA	
-gradeNumber  . . . . . . . . . .	Byte	 00000036 _DATA	
-gradePrompt  . . . . . . . . . .	Byte	 00000030 _DATA	
-string . . . . . . . . . . . . .	Byte	 00000043 _DATA	
+gradeNumber  . . . . . . . . . .	Byte	 00000042 _DATA	
+gradePrompt  . . . . . . . . . .	Byte	 0000003C _DATA	
+string . . . . . . . . . . . . .	Byte	 0000004F _DATA	
+sumOfWeights . . . . . . . . . .	DWord	 00000034 _DATA	
 weight1  . . . . . . . . . . . .	DWord	 00000010 _DATA	
 weight2  . . . . . . . . . . . .	DWord	 00000014 _DATA	
 weight3  . . . . . . . . . . . .	DWord	 00000018 _DATA	
 weight4  . . . . . . . . . . . .	DWord	 0000001C _DATA	
-weightNumber . . . . . . . . . .	Byte	 00000040 _DATA	
-weightPrompt . . . . . . . . . .	Byte	 00000039 _DATA	
+weightNumber . . . . . . . . . .	Byte	 0000004C _DATA	
+weightPrompt . . . . . . . . . .	Byte	 00000045 _DATA	
+weightedAverage  . . . . . . . .	DWord	 00000038 _DATA	
 weightedGrade1 . . . . . . . . .	DWord	 00000020 _DATA	
 weightedGrade2 . . . . . . . . .	DWord	 00000024 _DATA	
 weightedGrade3 . . . . . . . . .	DWord	 00000028 _DATA	
 weightedGrade4 . . . . . . . . .	DWord	 0000002C _DATA	
+weightedSum  . . . . . . . . . .	DWord	 00000030 _DATA	
 wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
 
 	   0 Warnings
