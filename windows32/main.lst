@@ -1,0 +1,104 @@
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    02/11/15 15:38:44
+main.asm						     Page 1 - 1
+
+
+				; General comments
+				; Author:  
+				; Date: 
+				; This is the Visual Studio 2012/Visual C++ Express Edition 2012 version   
+
+				; Preprocessor directives
+				.586		; use the 80586 set of instructions
+				.MODEL FLAT	; use the flat memory model (only 32 bit addresses, no segment:offset)
+
+				; External source files
+				INCLUDE io.h   ; header file for input/output
+			      C ; IO.H -- header file for I/O macros (listing suppressed)
+			      C .NOLIST      ; turn off listing
+			      C .LIST        ; begin listing
+			      C 
+
+				; Stack configuration
+				.STACK 4096	   ; allocate 4096 bytes for the stack
+
+				; Named memory allocation and initialization
+ 00000000			.DATA
+ 00000000 61 64 64 72 65	addrLbl	BYTE	"address", 0
+	   73 73 00
+ 00000008 31 32 33 20 4D	strCity	BYTE	"123 Main Street", 0Dh, 0Ah, "Bigtown, NY", 0
+	   61 69 6E 20 53
+	   74 72 65 65 74
+	   0D 0A 42 69 67
+	   74 6F 77 6E 2C
+	   20 4E 59 00
+
+				; procedure definitions
+ 00000000			.CODE
+ 00000000			_MainProc PROC
+
+						output	addrLbl, strCity
+
+ 00000019  B8 00000000		        mov     eax, 0  ; exit with return code 0
+ 0000001E  C3			        ret
+ 0000001F			_MainProc ENDP
+
+				END   ; end of source code
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    02/11/15 15:38:44
+main.asm						     Symbols 2 - 1
+
+
+
+
+Macros:
+
+                N a m e                 Type
+
+atod . . . . . . . . . . . . . .	Proc
+atow . . . . . . . . . . . . . .	Proc
+dtoa . . . . . . . . . . . . . .	Proc
+input  . . . . . . . . . . . . .	Proc
+output . . . . . . . . . . . . .	Proc
+wtoa . . . . . . . . . . . . . .	Proc
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000025 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 0000001F Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001F Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+_getInput  . . . . . . . . . . .	L Near	 00000000 FLAT	External
+_showOutput  . . . . . . . . . .	L Near	 00000000 FLAT	External
+addrLbl  . . . . . . . . . . . .	Byte	 00000000 _DATA	
+atodproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+atowproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+dtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+strCity  . . . . . . . . . . . .	Byte	 00000008 _DATA	
+wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+
+	   0 Warnings
+	   0 Errors
