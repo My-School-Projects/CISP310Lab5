@@ -7,8 +7,11 @@ INCLUDE io.h   ; header file for input/output
 
 .DATA
 
-	; We will be using DWORDS, because scores of more than 65535 seem reasonable,
-	; and scores of more than 4294967295 do not.
+	; The purpose of this program is to find the weighted average of 4 grades,
+	; each with an independent weight.
+
+	; We will be using DWORDS, because scores of more than 65535 (2^16 - 1) seem reasonable,
+	; and scores of more than 4294967295 (2^32 - 1) do not.
 	
 	grade1			DWORD	0
 	grade2			DWORD	0
@@ -19,6 +22,18 @@ INCLUDE io.h   ; header file for input/output
 	weight2			DWORD	0
 	weight3			DWORD	0
 	weight4			DWORD	0
+	
+	weightedGrade1	DWORD	0	; = grade1 * weight1
+	weightedGrade2	DWORD	0	; = grade2 * weight2
+	weightedGrade3	DWORD	0	; = grade3 * weight3
+	weightedGrade4	DWORD	0	; = grade4 * weight4
+
+	weightedSum		DWORD	0	; = weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
+
+	sumOfWeights	DWORD	0	; = weight1 + weight2 = weight3 + weight4
+
+	; FINAL RESULT
+	weightedAverage	DWORD	0	; = weightedSum / sumOfWeights
 
 
 	; The input macro expects a C-string (null terminated string) to display as a prompt.
