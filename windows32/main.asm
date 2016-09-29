@@ -38,7 +38,7 @@ INCLUDE io.h   ; header file for input/output
 	gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
 					BYTE	":", 0		; Stays constant - null terminated
 
-	weightPrompt1	BYTE	"Weight "	; Stays constant
+	weightPrompt	BYTE	"Weight "	; Stays constant
 	weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
 					BYTE	":", 0		; Stays constant - null terminated
 
@@ -50,29 +50,63 @@ INCLUDE io.h   ; header file for input/output
 .CODE
 _MainProc PROC
 	
-	mov		gradeNumber,	"1"			; Set prompt to "Grade 1:"
+	; Get grade1 and weight1
+
+	mov		gradeNumber,	"1"			; Set gradePrompt to "Grade 1:"
+	mov		weightNumber,	"1"			; Set weightPrompt to "Weight 1:"
 
 	input	gradePrompt,	string,	40	; Display prompt, string := user input (as string)
 	atod	string						; EAX := user input (as integer)
 	mov		grade1,			eax			; grade1 := EAX
 
-	mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
+	input	weightPrompt,	string, 40
+	atod	string
+	mov		weight1,		eax			; weight1 := user input (as integer)
 
-	input	gradePrompt,	string,	40	; Repeat the same steps as above for grades 2, 3 and 4
+	; Repeat the same steps as above for grades 2, 3 and 4
+
+	; Get grade2 and weight2
+
+	mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
+	mov		weightNumber,	"2"			; Set weightPrompt to "Weight 2:"
+										
+	input	gradePrompt,	string,	40
 	atod	string
 	mov		grade2,			eax
 
+	input	weightPrompt,	string, 40
+	atod	string
+	mov		weight2,		eax
+
+	; Get grade3 and weight3
+
 	mov		gradeNumber,	"3"
+	mov		weightNumber,	"3"
 
 	input	gradePrompt,	string,	40
 	atod	string
 	mov		grade3,			eax
+
+	input	weightPrompt,	string, 40
+	atod	string
+	mov		weight3,		eax
 	
+	; Get grade4 and weight4
+
 	mov		gradeNumber,	"4"
+	mov		weightNumber,	"4"
 
 	input	gradePrompt,	string,	40
 	atod	string
 	mov		grade4,			eax
+
+	input	weightPrompt,	string,	40
+	atod	string
+	mov		weight4,			eax
+
+	; Do the math!
+
+	; TODO
 
 	mov		eax,			0			; exit with return code 0
 	ret

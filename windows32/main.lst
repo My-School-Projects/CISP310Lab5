@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:15:55
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:26:47
 main.asm						     Page 1 - 1
 
 
@@ -47,7 +47,7 @@ main.asm						     Page 1 - 1
  00000026 58				gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
  00000027  3A 00							BYTE	":", 0		; Stays constant - null terminated
 
- 00000029 57 65 69 67 68		weightPrompt1	BYTE	"Weight "	; Stays constant
+ 00000029 57 65 69 67 68		weightPrompt	BYTE	"Weight "	; Stays constant
 	   74 20
  00000030 58				weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
  00000031  3A 00							BYTE	":", 0		; Stays constant - null terminated
@@ -62,40 +62,78 @@ main.asm						     Page 1 - 1
  00000000			.CODE
  00000000			_MainProc PROC
 					
- 00000000  C6 05 00000026 R		mov		gradeNumber,	"1"			; Set prompt to "Grade 1:"
+					; Get grade1 and weight1
+
+ 00000000  C6 05 00000026 R		mov		gradeNumber,	"1"			; Set gradePrompt to "Grade 1:"
+	   31
+ 00000007  C6 05 00000030 R		mov		weightNumber,	"1"			; Set weightPrompt to "Weight 1:"
 	   31
 
 					input	gradePrompt,	string,	40	; Display prompt, string := user input (as string)
 					atod	string						; EAX := user input (as integer)
- 00000034  A3 00000000 R		mov		grade1,			eax			; grade1 := EAX
+ 0000003B  A3 00000000 R		mov		grade1,			eax			; grade1 := EAX
 
- 00000039  C6 05 00000026 R		mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
-	   32
-
-					input	gradePrompt,	string,	40	; Repeat the same steps as above for grades 2, 3 and 4
+					input	weightPrompt,	string, 40
 					atod	string
- 0000006D  A3 00000004 R		mov		grade2,			eax
+ 0000006D  A3 00000010 R		mov		weight1,		eax			; weight1 := user input (as integer)
 
- 00000072  C6 05 00000026 R		mov		gradeNumber,	"3"
+					; Repeat the same steps as above for grades 2, 3 and 4
+
+					; Get grade2 and weight2
+
+ 00000072  C6 05 00000026 R		mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
+	   32
+ 00000079  C6 05 00000030 R		mov		weightNumber,	"2"			; Set weightPrompt to "Weight 2:"
+	   32
+														
+					input	gradePrompt,	string,	40
+					atod	string
+ 000000AD  A3 00000004 R		mov		grade2,			eax
+
+					input	weightPrompt,	string, 40
+					atod	string
+ 000000DF  A3 00000014 R		mov		weight2,		eax
+
+					; Get grade3 and weight3
+
+ 000000E4  C6 05 00000026 R		mov		gradeNumber,	"3"
+	   33
+ 000000EB  C6 05 00000030 R		mov		weightNumber,	"3"
 	   33
 
 					input	gradePrompt,	string,	40
 					atod	string
- 000000A6  A3 00000008 R		mov		grade3,			eax
+ 0000011F  A3 00000008 R		mov		grade3,			eax
+
+					input	weightPrompt,	string, 40
+					atod	string
+ 00000151  A3 00000018 R		mov		weight3,		eax
 					
- 000000AB  C6 05 00000026 R		mov		gradeNumber,	"4"
+					; Get grade4 and weight4
+
+ 00000156  C6 05 00000026 R		mov		gradeNumber,	"4"
+	   34
+ 0000015D  C6 05 00000030 R		mov		weightNumber,	"4"
 	   34
 
 					input	gradePrompt,	string,	40
 					atod	string
- 000000DF  A3 0000000C R		mov		grade4,			eax
+ 00000191  A3 0000000C R		mov		grade4,			eax
 
- 000000E4  B8 00000000			mov		eax,			0			; exit with return code 0
- 000000E9  C3				ret
- 000000EA			_MainProc ENDP
+					input	weightPrompt,	string,	40
+					atod	string
+ 000001C3  A3 0000001C R		mov		weight4,			eax
+
+					; Do the math!
+
+					; TODO
+
+ 000001C8  B8 00000000			mov		eax,			0			; exit with return code 0
+ 000001CD  C3				ret
+ 000001CE			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:15:55
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:26:47
 main.asm						     Symbols 2 - 1
 
 
@@ -120,14 +158,14 @@ Segments and Groups:
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
 _DATA  . . . . . . . . . . . . .	32 Bit	 0000005B Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 000000EA Para	  Public  'CODE'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000001CE Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
-_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000EA Public
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000001CE Public
 
 
 Symbols:
@@ -160,7 +198,7 @@ weight2  . . . . . . . . . . . .	DWord	 00000014 _DATA
 weight3  . . . . . . . . . . . .	DWord	 00000018 _DATA	
 weight4  . . . . . . . . . . . .	DWord	 0000001C _DATA	
 weightNumber . . . . . . . . . .	Byte	 00000030 _DATA	
-weightPrompt1  . . . . . . . . .	Byte	 00000029 _DATA	
+weightPrompt . . . . . . . . . .	Byte	 00000029 _DATA	
 wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
 
 	   0 Warnings
