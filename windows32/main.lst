@@ -1,49 +1,101 @@
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    02/11/15 15:38:44
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:15:55
 main.asm						     Page 1 - 1
 
 
-				; General comments
-				; Author:  
-				; Date: 
-				; This is the Visual Studio 2012/Visual C++ Express Edition 2012 version   
+				.586
+				.MODEL FLAT	; only 32 bit addresses, no segment:offset
 
-				; Preprocessor directives
-				.586		; use the 80586 set of instructions
-				.MODEL FLAT	; use the flat memory model (only 32 bit addresses, no segment:offset)
-
-				; External source files
 				INCLUDE io.h   ; header file for input/output
 			      C ; IO.H -- header file for I/O macros (listing suppressed)
 			      C .NOLIST      ; turn off listing
 			      C .LIST        ; begin listing
 			      C 
 
-				; Stack configuration
 				.STACK 4096	   ; allocate 4096 bytes for the stack
 
-				; Named memory allocation and initialization
  00000000			.DATA
- 00000000 61 64 64 72 65	addrLbl	BYTE	"address", 0
-	   73 73 00
- 00000008 31 32 33 20 4D	strCity	BYTE	"123 Main Street", 0Dh, 0Ah, "Bigtown, NY", 0
-	   61 69 6E 20 53
-	   74 72 65 65 74
-	   0D 0A 42 69 67
-	   74 6F 77 6E 2C
-	   20 4E 59 00
 
-				; procedure definitions
+					; We will be using DWORDS, because scores of more than 65535 seem reasonable,
+					; and scores of more than 4294967295 do not.
+					
+ 00000000 00000000			grade1			DWORD	0
+ 00000004 00000000			grade2			DWORD	0
+ 00000008 00000000			grade3			DWORD	0
+ 0000000C 00000000			grade4			DWORD	0
+					
+ 00000010 00000000			weight1			DWORD	0
+ 00000014 00000000			weight2			DWORD	0
+ 00000018 00000000			weight3			DWORD	0
+ 0000001C 00000000			weight4			DWORD	0
+
+
+					; The input macro expects a C-string (null terminated string) to display as a prompt.
+
+					; We need 8 prompts, 4 for grades and 4 for weights, and the prompts are almost exactly
+					; the same for each, except that each ends with a number that will increment with each use.
+					; Instead of duplicating the same prompt 4 times in memory, we will use one prompt and change
+					; the number before each use.
+
+					; The actual prompts will look like:
+					; "Grade 1:"
+					; or
+					; "Weight 3:"
+					; depending on the iteration.
+
+ 00000020 47 72 61 64 65		gradePrompt		BYTE	"Grade "	; Stays constant
+	   20
+ 00000026 58				gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
+ 00000027  3A 00							BYTE	":", 0		; Stays constant - null terminated
+
+ 00000029 57 65 69 67 68		weightPrompt1	BYTE	"Weight "	; Stays constant
+	   74 20
+ 00000030 58				weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
+ 00000031  3A 00							BYTE	":", 0		; Stays constant - null terminated
+
+					; The input macro needs a 40 character string to store data in
+
+ 00000033  00000028 [			string			BYTE	40	DUP	(0)
+	    00
+	   ]
+					
+
  00000000			.CODE
  00000000			_MainProc PROC
+					
+ 00000000  C6 05 00000026 R		mov		gradeNumber,	"1"			; Set prompt to "Grade 1:"
+	   31
 
-						output	addrLbl, strCity
+					input	gradePrompt,	string,	40	; Display prompt, string := user input (as string)
+					atod	string						; EAX := user input (as integer)
+ 00000034  A3 00000000 R		mov		grade1,			eax			; grade1 := EAX
 
- 00000019  B8 00000000		        mov     eax, 0  ; exit with return code 0
- 0000001E  C3			        ret
- 0000001F			_MainProc ENDP
+ 00000039  C6 05 00000026 R		mov		gradeNumber,	"2"			; Set prompt to "Grade 2:"
+	   32
+
+					input	gradePrompt,	string,	40	; Repeat the same steps as above for grades 2, 3 and 4
+					atod	string
+ 0000006D  A3 00000004 R		mov		grade2,			eax
+
+ 00000072  C6 05 00000026 R		mov		gradeNumber,	"3"
+	   33
+
+					input	gradePrompt,	string,	40
+					atod	string
+ 000000A6  A3 00000008 R		mov		grade3,			eax
+					
+ 000000AB  C6 05 00000026 R		mov		gradeNumber,	"4"
+	   34
+
+					input	gradePrompt,	string,	40
+					atod	string
+ 000000DF  A3 0000000C R		mov		grade4,			eax
+
+ 000000E4  B8 00000000			mov		eax,			0			; exit with return code 0
+ 000000E9  C3				ret
+ 000000EA			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.50727.1	    02/11/15 15:38:44
+Microsoft (R) Macro Assembler Version 11.00.50727.1	    09/29/16 01:15:55
 main.asm						     Symbols 2 - 1
 
 
@@ -67,15 +119,15 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000025 Para	  Public  'DATA'	
-_TEXT  . . . . . . . . . . . . .	32 Bit	 0000001F Para	  Public  'CODE'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 0000005B Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 000000EA Para	  Public  'CODE'	
 
 
 Procedures, parameters, and locals:
 
                 N a m e                 Type     Value    Attr
 
-_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 0000001F Public
+_MainProc  . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 000000EA Public
 
 
 Symbols:
@@ -93,11 +145,22 @@ Symbols:
 @stack . . . . . . . . . . . . .	Text   	 FLAT
 _getInput  . . . . . . . . . . .	L Near	 00000000 FLAT	External
 _showOutput  . . . . . . . . . .	L Near	 00000000 FLAT	External
-addrLbl  . . . . . . . . . . . .	Byte	 00000000 _DATA	
 atodproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
 atowproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
 dtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
-strCity  . . . . . . . . . . . .	Byte	 00000008 _DATA	
+grade1 . . . . . . . . . . . . .	DWord	 00000000 _DATA	
+grade2 . . . . . . . . . . . . .	DWord	 00000004 _DATA	
+grade3 . . . . . . . . . . . . .	DWord	 00000008 _DATA	
+grade4 . . . . . . . . . . . . .	DWord	 0000000C _DATA	
+gradeNumber  . . . . . . . . . .	Byte	 00000026 _DATA	
+gradePrompt  . . . . . . . . . .	Byte	 00000020 _DATA	
+string . . . . . . . . . . . . .	Byte	 00000033 _DATA	
+weight1  . . . . . . . . . . . .	DWord	 00000010 _DATA	
+weight2  . . . . . . . . . . . .	DWord	 00000014 _DATA	
+weight3  . . . . . . . . . . . .	DWord	 00000018 _DATA	
+weight4  . . . . . . . . . . . .	DWord	 0000001C _DATA	
+weightNumber . . . . . . . . . .	Byte	 00000030 _DATA	
+weightPrompt1  . . . . . . . . .	Byte	 00000029 _DATA	
 wtoaproc . . . . . . . . . . . .	L Near	 00000000 FLAT	External
 
 	   0 Warnings
