@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:43:39
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:51:56
 main.asm						     Page 1 - 1
 
 
@@ -68,9 +68,12 @@ main.asm						     Page 1 - 1
  0000004C 58				weightNumber	BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
  0000004D  3A 00							BYTE	":", 0		; Stays constant - null terminated
 
-					; The input macro needs a 40 character string to store data in
+					; The input macro needs a C-string to store the data in.
+					; We're using a 4 character string because our valid input range is 0 to 100,
+					; and the largest valid input will be "100", and we need four bytes
+					; to store "100" as a C-string (3 ASCII digits + Null terminator)
 
- 0000004F  00000028 [			string			BYTE	40	DUP	(0)
+ 0000004F  00000004 [			string			BYTE	4	DUP	(0)
 	    00
 	   ]
 
@@ -80,14 +83,14 @@ main.asm						     Page 1 - 1
 					; outputValue will be replaced at runtime with an 11 character string which will hold the decimal
 					; value of weightedAverage
 
- 00000077 57 65 69 67 68		outputLabel		BYTE	"Weighted Average:", 0	; Label to be displayed upon output
+ 00000053 57 65 69 67 68		outputLabel		BYTE	"Weighted Average:", 0	; Label to be displayed upon output
 	   74 65 64 20 41
 	   76 65 72 61 67
 	   65 3A 00
- 00000089  0000000B [			outputValue		BYTE	11	DUP	("X")			; Space for result of dtoa (11 ASCII coded bytes)
+ 00000065  0000000B [			outputValue		BYTE	11	DUP	("X")			; Space for result of dtoa (11 ASCII coded bytes)
 	    58
 	   ]
- 00000094  00								BYTE	0						; Null string terminator
+ 00000070  00								BYTE	0						; Null string terminator
 
  00000000			.CODE
  00000000			_MainProc PROC
@@ -100,11 +103,11 @@ main.asm						     Page 1 - 1
 	   31
 
 
-					input	gradePrompt,		string,	40	; Display prompt, string := user input (as string)
+					input	gradePrompt,		string,	4	; Display prompt, string := user input (as string)
 					atod	string							; EAX := user input (as integer)
  0000003B  A3 00000000 R		mov		grade1,				eax			; grade1 := EAX
 
-					input	weightPrompt,		string, 40
+					input	weightPrompt,		string, 4
 					atod	string
  0000006D  A3 00000010 R		mov		weight1,			eax			; weight1 := user input (as integer)
 
@@ -117,11 +120,11 @@ main.asm						     Page 1 - 1
  00000079  C6 05 0000004C R		mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 	   32
 														
-					input	gradePrompt,		string,	40
+					input	gradePrompt,		string,	4
 					atod	string
  000000AD  A3 00000004 R		mov		grade2,				eax
 
-					input	weightPrompt,		string, 40
+					input	weightPrompt,		string, 4
 					atod	string
  000000DF  A3 00000014 R		mov		weight2,			eax
 
@@ -132,11 +135,11 @@ main.asm						     Page 1 - 1
  000000EB  C6 05 0000004C R		mov		weightNumber,		"3"
 	   33
 
-					input	gradePrompt,		string,	40
+					input	gradePrompt,		string,	4
 					atod	string
  0000011F  A3 00000008 R		mov		grade3,				eax
 
-					input	weightPrompt,		string, 40
+					input	weightPrompt,		string, 4
 					atod	string
  00000151  A3 00000018 R		mov		weight3,			eax
 					
@@ -147,11 +150,11 @@ main.asm						     Page 1 - 1
  0000015D  C6 05 0000004C R		mov		weightNumber,		"4"
 	   34
 
-					input	gradePrompt,		string,	40
+					input	gradePrompt,		string,	4
 					atod	string
  00000191  A3 0000000C R		mov		grade4,				eax
 
-					input	weightPrompt,		string,	40
+					input	weightPrompt,		string,	4
 					atod	string
  000001C3  A3 0000001C R		mov		weight4,			eax
 
@@ -200,7 +203,7 @@ main.asm						     Page 1 - 1
  0000028C			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:43:39
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:51:56
 main.asm						     Symbols 2 - 1
 
 
@@ -224,7 +227,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000095 Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000071 Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 0000028C Para	  Public  'CODE'	
 
 
@@ -259,8 +262,8 @@ grade3 . . . . . . . . . . . . .	DWord	 00000008 _DATA
 grade4 . . . . . . . . . . . . .	DWord	 0000000C _DATA	
 gradeNumber  . . . . . . . . . .	Byte	 00000042 _DATA	
 gradePrompt  . . . . . . . . . .	Byte	 0000003C _DATA	
-outputLabel  . . . . . . . . . .	Byte	 00000077 _DATA	
-outputValue  . . . . . . . . . .	Byte	 00000089 _DATA	
+outputLabel  . . . . . . . . . .	Byte	 00000053 _DATA	
+outputValue  . . . . . . . . . .	Byte	 00000065 _DATA	
 string . . . . . . . . . . . . .	Byte	 0000004F _DATA	
 sumOfWeights . . . . . . . . . .	DWord	 00000034 _DATA	
 weight1  . . . . . . . . . . . .	DWord	 00000010 _DATA	

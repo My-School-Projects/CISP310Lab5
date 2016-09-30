@@ -50,17 +50,20 @@ INCLUDE io.h   ; header file for input/output
 	; "Weight 3:"
 	; depending on the iteration.
 
-	gradePrompt		BYTE	"Grade "	; Stays constant
-	gradeNumber		BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
-					BYTE	":", 0		; Stays constant - null terminated
+	gradePrompt		BYTE	"Grade "		; Stays constant
+	gradeNumber		BYTE	"X"				; "X" will be replaced with a ASCII coded digit at runtime
+					BYTE	" [0-100]:", 0	; Stays constant - null terminated
 
-	weightPrompt	BYTE	"Weight "	; Stays constant
-	weightNumber	BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
-					BYTE	":", 0		; Stays constant - null terminated
+	weightPrompt	BYTE	"Weight "		; Stays constant
+	weightNumber	BYTE	"X"				; "X" will be replaced with a ASCII coded digit at runtime
+					BYTE	" [0-100]:", 0	; Stays constant - null terminated
 
-	; The input macro needs a 40 character string to store data in
+	; The input macro needs a C-string to store the data in.
+	; We're using a 4 character string because our valid input range is 0 to 100,
+	; and the largest valid input will be "100", and we need four bytes
+	; to store "100" as a C-string (3 ASCII digits + Null terminator)
 
-	string			BYTE	40	DUP	(0)
+	string			BYTE	4	DUP	(0)
 
 	; The output macro needs a C-string (null-terminated string) to display as a label,
 	; and a C-string to display as a message.
@@ -80,53 +83,53 @@ _MainProc PROC
 	mov		gradeNumber,		"1"			; Set gradePrompt to "Grade 1:"
 	mov		weightNumber,		"1"			; Set weightPrompt to "Weight 1:"
 
+	; We pass 4 to the input macro, which specifies that we want to copy a maximum of 4 bytes into memory.
+	; 3 of those bytes will be ASCII coded digits (0-100), and the last will be a Null string terminator.
 
-	input	gradePrompt,		string,	40	; Display prompt, string := user input (as string)
+	input	gradePrompt,		string,	4	; Display prompt, string := user input (as string)
 	atod	string							; EAX := user input (as integer)
 	mov		grade1,				eax			; grade1 := EAX
 
-	input	weightPrompt,		string, 40
+	input	weightPrompt,		string, 4
 	atod	string
 	mov		weight1,			eax			; weight1 := user input (as integer)
 
-	; Repeat the same steps as above for grades 2, 3 and 4
-
-	; Get grade2 and weight2 (same as grade1)
+	; Get grade2 and weight2 (see grade1, weight1 for comments)
 
 	mov		gradeNumber,		"2"			; Set gradePrompt to "Grade 2:"
 	mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 										
-	input	gradePrompt,		string,	40
+	input	gradePrompt,		string,	4
 	atod	string
 	mov		grade2,				eax
 
-	input	weightPrompt,		string, 40
+	input	weightPrompt,		string, 4
 	atod	string
 	mov		weight2,			eax
 
-	; Get grade3 and weight3
+	; Get grade3 and weight3 (see grade1, weight1 for comments)
 
 	mov		gradeNumber,		"3"
 	mov		weightNumber,		"3"
 
-	input	gradePrompt,		string,	40
+	input	gradePrompt,		string,	4
 	atod	string
 	mov		grade3,				eax
 
-	input	weightPrompt,		string, 40
+	input	weightPrompt,		string, 4
 	atod	string
 	mov		weight3,			eax
 	
-	; Get grade4 and weight4
+	; Get grade4 and weight4 (see grade1, weight1 for comments)
 
 	mov		gradeNumber,		"4"
 	mov		weightNumber,		"4"
 
-	input	gradePrompt,		string,	40
+	input	gradePrompt,		string,	4
 	atod	string
 	mov		grade4,				eax
 
-	input	weightPrompt,		string,	40
+	input	weightPrompt,		string,	4
 	atod	string
 	mov		weight4,			eax
 
