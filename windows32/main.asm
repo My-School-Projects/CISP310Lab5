@@ -51,7 +51,7 @@ INCLUDE io.h   ; header file for input/output
 	; depending on the iteration.
 
 	gradePrompt		BYTE	"Grade "		; Stays constant
-	gradeNumber		BYTE	"X"				; "X" will be replaced with a ASCII coded digit at runtime
+	gradeNumber		BYTE	"X"				; "X" will be replaced by "1", "2", "3", or "4" at runtime
 					BYTE	" [0-100]:", 0	; Stays constant - null terminated
 
 	weightPrompt	BYTE	"Weight "		; Stays constant
@@ -162,22 +162,22 @@ _MainProc PROC
 	mov		eax,				weightedGrade1	; EAX := weightedGrade1
 												; EAX := 1720d
 	add		eax,				weightedGrade2	; EAX := weightedGrade1 + weightedGrade2
-												; EAX := 3240d (CF = 0 : no overflow)
+												; EAX := 3240d (CF = 0 : sum fits in EAX)
 	add		eax,				weightedGrade3	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3
-												; EAX := 5850d (CF = 0 : no overflow)
+												; EAX := 5850d (CF = 0 : sum fits in EAX)
 	add		eax,				weightedGrade4	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
-												; EAX := 9130d (CF = 0 : no overflow)
+												; EAX := 9130d (CF = 0 : sum fits in EAX)
 	mov		weightedSum,		eax				; weightedSum := EAX
 												; weightedSum := 9130d
 
 	mov		eax,				weight1			; EAX := weight1
 												; EAX := 40d
 	add		eax,				weight2			; EAX := weight1 + weight2
-												; EAX := 40d + 20d (= 60d) (CF = 0 : no overflow)
+												; EAX := 40d + 20d (= 60d) (CF = 0 : sum fits in EAX)
 	add		eax,				weight3			; EAX := weight1 + weight2 + weight3
-												; EAX := 40d + 20d + 30d (= 90d) (CF = 0 : no overflow)
+												; EAX := 40d + 20d + 30d (= 90d) (CF = 0 : sum fits in EAX)
 	add		eax,				weight4			; EAX := weight1 + weight2 + weight3 + weight4
-												; EAX := 40d + 20d + 30d + 40d (= 130d) (CF = 0 : no overflow)
+												; EAX := 40d + 20d + 30d + 40d (= 130d) (CF = 0 : sum fits in EAX)
 	mov		sumOfWeights,		eax				; sumOfWeights := EAX
 												; sumOfWeights := 130d
 
@@ -187,6 +187,8 @@ _MainProc PROC
 												; EAX := 9130d
 	div		sumOfWeights						; EAX := weightedSum / sumOfWeights
 												; EAX := 9130d / 130d (= 70d)
+												; The div instruction does not set any flags, so we can ignore them.
+												; The answer will always fit.
 	mov		weightedAverage,	eax				; weightedAverage := EAX
 												; weightedAverage := 70d
 
