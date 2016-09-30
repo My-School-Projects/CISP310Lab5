@@ -63,7 +63,7 @@ INCLUDE io.h   ; header file for input/output
 	; and the largest valid input will be "100", and we need four bytes
 	; to store "100" as a C-string (3 ASCII digits + Null terminator)
 
-	string			BYTE	4	DUP	(0)
+	inputStr		BYTE	4	DUP	(0)
 
 	; The output macro needs a C-string (null-terminated string) to display as a label,
 	; and a C-string to display as a message.
@@ -86,12 +86,12 @@ _MainProc PROC
 	; We pass 4 to the input macro, which specifies that we want to copy a maximum of 4 bytes into memory.
 	; 3 of those bytes will be ASCII coded digits (0-100), and the last will be a Null string terminator.
 
-	input	gradePrompt,		string,	4	; Display prompt, string := user input (as string)
-	atod	string							; EAX := user input (as integer)
+	input	gradePrompt,		inputStr,	4	; Display prompt, inputStr := user input (as string)
+	atod	inputStr						; EAX := user input (as integer)
 	mov		grade1,				eax			; grade1 := EAX
 
-	input	weightPrompt,		string, 4
-	atod	string
+	input	weightPrompt,		inputStr, 4
+	atod	inputStr
 	mov		weight1,			eax			; weight1 := user input (as integer)
 
 	; Get grade2 and weight2 (see grade1, weight1 for comments)
@@ -99,12 +99,12 @@ _MainProc PROC
 	mov		gradeNumber,		"2"			; Set gradePrompt to "Grade 2:"
 	mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 										
-	input	gradePrompt,		string,	4
-	atod	string
+	input	gradePrompt,		inputStr,	4
+	atod	inputStr
 	mov		grade2,				eax
 
-	input	weightPrompt,		string, 4
-	atod	string
+	input	weightPrompt,		inputStr, 4
+	atod	inputStr
 	mov		weight2,			eax
 
 	; Get grade3 and weight3 (see grade1, weight1 for comments)
@@ -112,12 +112,12 @@ _MainProc PROC
 	mov		gradeNumber,		"3"
 	mov		weightNumber,		"3"
 
-	input	gradePrompt,		string,	4
-	atod	string
+	input	gradePrompt,		inputStr,	4
+	atod	inputStr
 	mov		grade3,				eax
 
-	input	weightPrompt,		string, 4
-	atod	string
+	input	weightPrompt,		inputStr, 4
+	atod	inputStr
 	mov		weight3,			eax
 	
 	; Get grade4 and weight4 (see grade1, weight1 for comments)
@@ -125,12 +125,12 @@ _MainProc PROC
 	mov		gradeNumber,		"4"
 	mov		weightNumber,		"4"
 
-	input	gradePrompt,		string,	4
-	atod	string
+	input	gradePrompt,		inputStr,	4
+	atod	inputStr
 	mov		grade4,				eax
 
-	input	weightPrompt,		string,	4
-	atod	string
+	input	weightPrompt,		inputStr,	4
+	atod	inputStr
 	mov		weight4,			eax
 
 	; Do the math!
@@ -138,6 +138,7 @@ _MainProc PROC
 	mov		eax,				grade1
 	mul		weight1
 	mov		weightedGrade1,		eax				; weightedGrade1 := grade1 * weight1
+												; weightedGrade1 := 43 * 40 (1720)
 
 	mov		eax,				grade2
 	mul		weight2

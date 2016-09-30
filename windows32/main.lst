@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:51:56
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:27:43
 main.asm						     Page 1 - 1
 
 
@@ -58,22 +58,24 @@ main.asm						     Page 1 - 1
 					; "Weight 3:"
 					; depending on the iteration.
 
- 0000003C 47 72 61 64 65		gradePrompt		BYTE	"Grade "	; Stays constant
+ 0000003C 47 72 61 64 65		gradePrompt		BYTE	"Grade "		; Stays constant
 	   20
- 00000042 58				gradeNumber		BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
- 00000043  3A 00							BYTE	":", 0		; Stays constant - null terminated
+ 00000042 58				gradeNumber		BYTE	"X"				; "X" will be replaced with a ASCII coded digit at runtime
+ 00000043  20 5B 30 2D 31						BYTE	" [0-100]:", 0	; Stays constant - null terminated
+	   30 30 5D 3A 00
 
- 00000045 57 65 69 67 68		weightPrompt	BYTE	"Weight "	; Stays constant
+ 0000004D 57 65 69 67 68		weightPrompt	BYTE	"Weight "		; Stays constant
 	   74 20
- 0000004C 58				weightNumber	BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
- 0000004D  3A 00							BYTE	":", 0		; Stays constant - null terminated
+ 00000054 58				weightNumber	BYTE	"X"				; "X" will be replaced with a ASCII coded digit at runtime
+ 00000055  20 5B 30 2D 31						BYTE	" [0-100]:", 0	; Stays constant - null terminated
+	   30 30 5D 3A 00
 
 					; The input macro needs a C-string to store the data in.
 					; We're using a 4 character string because our valid input range is 0 to 100,
 					; and the largest valid input will be "100", and we need four bytes
 					; to store "100" as a C-string (3 ASCII digits + Null terminator)
 
- 0000004F  00000004 [			string			BYTE	4	DUP	(0)
+ 0000005F  00000004 [			inputStr		BYTE	4	DUP	(0)
 	    00
 	   ]
 
@@ -83,14 +85,14 @@ main.asm						     Page 1 - 1
 					; outputValue will be replaced at runtime with an 11 character string which will hold the decimal
 					; value of weightedAverage
 
- 00000053 57 65 69 67 68		outputLabel		BYTE	"Weighted Average:", 0	; Label to be displayed upon output
+ 00000063 57 65 69 67 68		outputLabel		BYTE	"Weighted Average:", 0	; Label to be displayed upon output
 	   74 65 64 20 41
 	   76 65 72 61 67
 	   65 3A 00
- 00000065  0000000B [			outputValue		BYTE	11	DUP	("X")			; Space for result of dtoa (11 ASCII coded bytes)
+ 00000075  0000000B [			outputValue		BYTE	11	DUP	("X")			; Space for result of dtoa (11 ASCII coded bytes)
 	    58
 	   ]
- 00000070  00								BYTE	0						; Null string terminator
+ 00000080  00								BYTE	0						; Null string terminator
 
  00000000			.CODE
  00000000			_MainProc PROC
@@ -99,63 +101,63 @@ main.asm						     Page 1 - 1
 
  00000000  C6 05 00000042 R		mov		gradeNumber,		"1"			; Set gradePrompt to "Grade 1:"
 	   31
- 00000007  C6 05 0000004C R		mov		weightNumber,		"1"			; Set weightPrompt to "Weight 1:"
+ 00000007  C6 05 00000054 R		mov		weightNumber,		"1"			; Set weightPrompt to "Weight 1:"
 	   31
 
+					; We pass 4 to the input macro, which specifies that we want to copy a maximum of 4 bytes into memory.
+					; 3 of those bytes will be ASCII coded digits (0-100), and the last will be a Null string terminator.
 
-					input	gradePrompt,		string,	4	; Display prompt, string := user input (as string)
-					atod	string							; EAX := user input (as integer)
+					input	gradePrompt,		inputStr,	4	; Display prompt, inputStr := user input (as string)
+					atod	inputStr						; EAX := user input (as integer)
  0000003B  A3 00000000 R		mov		grade1,				eax			; grade1 := EAX
 
-					input	weightPrompt,		string, 4
-					atod	string
+					input	weightPrompt,		inputStr, 4
+					atod	inputStr
  0000006D  A3 00000010 R		mov		weight1,			eax			; weight1 := user input (as integer)
 
-					; Repeat the same steps as above for grades 2, 3 and 4
-
-					; Get grade2 and weight2 (same as grade1)
+					; Get grade2 and weight2 (see grade1, weight1 for comments)
 
  00000072  C6 05 00000042 R		mov		gradeNumber,		"2"			; Set gradePrompt to "Grade 2:"
 	   32
- 00000079  C6 05 0000004C R		mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
+ 00000079  C6 05 00000054 R		mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 	   32
 														
-					input	gradePrompt,		string,	4
-					atod	string
+					input	gradePrompt,		inputStr,	4
+					atod	inputStr
  000000AD  A3 00000004 R		mov		grade2,				eax
 
-					input	weightPrompt,		string, 4
-					atod	string
+					input	weightPrompt,		inputStr, 4
+					atod	inputStr
  000000DF  A3 00000014 R		mov		weight2,			eax
 
-					; Get grade3 and weight3
+					; Get grade3 and weight3 (see grade1, weight1 for comments)
 
  000000E4  C6 05 00000042 R		mov		gradeNumber,		"3"
 	   33
- 000000EB  C6 05 0000004C R		mov		weightNumber,		"3"
+ 000000EB  C6 05 00000054 R		mov		weightNumber,		"3"
 	   33
 
-					input	gradePrompt,		string,	4
-					atod	string
+					input	gradePrompt,		inputStr,	4
+					atod	inputStr
  0000011F  A3 00000008 R		mov		grade3,				eax
 
-					input	weightPrompt,		string, 4
-					atod	string
+					input	weightPrompt,		inputStr, 4
+					atod	inputStr
  00000151  A3 00000018 R		mov		weight3,			eax
 					
-					; Get grade4 and weight4
+					; Get grade4 and weight4 (see grade1, weight1 for comments)
 
  00000156  C6 05 00000042 R		mov		gradeNumber,		"4"
 	   34
- 0000015D  C6 05 0000004C R		mov		weightNumber,		"4"
+ 0000015D  C6 05 00000054 R		mov		weightNumber,		"4"
 	   34
 
-					input	gradePrompt,		string,	4
-					atod	string
+					input	gradePrompt,		inputStr,	4
+					atod	inputStr
  00000191  A3 0000000C R		mov		grade4,				eax
 
-					input	weightPrompt,		string,	4
-					atod	string
+					input	weightPrompt,		inputStr,	4
+					atod	inputStr
  000001C3  A3 0000001C R		mov		weight4,			eax
 
 					; Do the math!
@@ -163,6 +165,7 @@ main.asm						     Page 1 - 1
  000001C8  A1 00000000 R		mov		eax,				grade1
  000001CD  F7 25 00000010 R		mul		weight1
  000001D3  A3 00000020 R		mov		weightedGrade1,		eax				; weightedGrade1 := grade1 * weight1
+																; weightedGrade1 := 43 * 40 (1720)
 
  000001D8  A1 00000004 R		mov		eax,				grade2
  000001DD  F7 25 00000014 R		mul		weight2
@@ -203,7 +206,7 @@ main.asm						     Page 1 - 1
  0000028C			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 17:51:56
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:27:43
 main.asm						     Symbols 2 - 1
 
 
@@ -227,7 +230,7 @@ Segments and Groups:
 
 FLAT . . . . . . . . . . . . . .	GROUP
 STACK  . . . . . . . . . . . . .	32 Bit	 00001000 Para	  Stack	  'STACK'	 
-_DATA  . . . . . . . . . . . . .	32 Bit	 00000071 Para	  Public  'DATA'	
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000081 Para	  Public  'DATA'	
 _TEXT  . . . . . . . . . . . . .	32 Bit	 0000028C Para	  Public  'CODE'	
 
 
@@ -262,16 +265,16 @@ grade3 . . . . . . . . . . . . .	DWord	 00000008 _DATA
 grade4 . . . . . . . . . . . . .	DWord	 0000000C _DATA	
 gradeNumber  . . . . . . . . . .	Byte	 00000042 _DATA	
 gradePrompt  . . . . . . . . . .	Byte	 0000003C _DATA	
-outputLabel  . . . . . . . . . .	Byte	 00000053 _DATA	
-outputValue  . . . . . . . . . .	Byte	 00000065 _DATA	
-string . . . . . . . . . . . . .	Byte	 0000004F _DATA	
+inputStr . . . . . . . . . . . .	Byte	 0000005F _DATA	
+outputLabel  . . . . . . . . . .	Byte	 00000063 _DATA	
+outputValue  . . . . . . . . . .	Byte	 00000075 _DATA	
 sumOfWeights . . . . . . . . . .	DWord	 00000034 _DATA	
 weight1  . . . . . . . . . . . .	DWord	 00000010 _DATA	
 weight2  . . . . . . . . . . . .	DWord	 00000014 _DATA	
 weight3  . . . . . . . . . . . .	DWord	 00000018 _DATA	
 weight4  . . . . . . . . . . . .	DWord	 0000001C _DATA	
-weightNumber . . . . . . . . . .	Byte	 0000004C _DATA	
-weightPrompt . . . . . . . . . .	Byte	 00000045 _DATA	
+weightNumber . . . . . . . . . .	Byte	 00000054 _DATA	
+weightPrompt . . . . . . . . . .	Byte	 0000004D _DATA	
 weightedAverage  . . . . . . . .	DWord	 00000038 _DATA	
 weightedGrade1 . . . . . . . . .	DWord	 00000020 _DATA	
 weightedGrade2 . . . . . . . . .	DWord	 00000024 _DATA	
