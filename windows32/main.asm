@@ -138,39 +138,59 @@ _MainProc PROC
 	mov		eax,				grade1
 	mul		weight1
 	mov		weightedGrade1,		eax				; weightedGrade1 := grade1 * weight1
-												; weightedGrade1 := 43 * 40 (1720)
+												; weightedGrade1 := 43d * 40d (= 1720d)
+												; OF = CF = 0 (no significant bits in EDX)
 
 	mov		eax,				grade2
 	mul		weight2
 	mov		weightedGrade2,	 eax				; weightedGrade2 := grade2 * weight2
+												; weightedGrade2 := 76d * 20d (= 1520d)
+												; OF = CF = 0 (no significant bits in EDX)
 
 	mov		eax,				grade3
 	mul		weight3
 	mov		weightedGrade3,		eax				; weightedGrade3 := grade3 * weight3
+												; weightedGrade3 := 87d * 30d (= 2610d)
+												; OF = CF = 0 (no significant bits in EDX)
 
 	mov		eax,				grade4
 	mul		weight4
 	mov		weightedGrade4,		eax				; weightedGrade4 := grade4 * weight4
+												; weightedGrade4 := 82d * 40d (= 3280d)
+												; OF = CF = 0 (no significant bits in EDX)
 
 	mov		eax,				weightedGrade1	; EAX := weightedGrade1
+												; EAX := 1720d
 	add		eax,				weightedGrade2	; EAX := weightedGrade1 + weightedGrade2
+												; EAX := 3240d (CF = 0 : no overflow)
 	add		eax,				weightedGrade3	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3
+												; EAX := 5850d (CF = 0 : no overflow)
 	add		eax,				weightedGrade4	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
+												; EAX := 9130d (CF = 0 : no overflow)
 	mov		weightedSum,		eax				; weightedSum := EAX
+												; weightedSum := 9130d
 
 	mov		eax,				weight1			; EAX := weight1
+												; EAX := 40d
 	add		eax,				weight2			; EAX := weight1 + weight2
+												; EAX := 40d + 20d (= 60d) (CF = 0 : no overflow)
 	add		eax,				weight3			; EAX := weight1 + weight2 + weight3
+												; EAX := 40d + 20d + 30d (= 90d) (CF = 0 : no overflow)
 	add		eax,				weight4			; EAX := weight1 + weight2 + weight3 + weight4
+												; EAX := 40d + 20d + 30d + 40d (= 130d) (CF = 0 : no overflow)
 	mov		sumOfWeights,		eax				; sumOfWeights := EAX
+												; sumOfWeights := 130d
 
 	; Division by a DWORD requires the dividend to be stored in EDX:EAX
 	mov		edx,				0				; EDX := 0 (our dividend is only 32 bits - only the lower order bits are used)
 	mov		eax,				weightedSum		; EAX := weightedSum
+												; EAX := 9130d
 	div		sumOfWeights						; EAX := weightedSum / sumOfWeights
+												; EAX := 9130d / 130d (= 70d)
 	mov		weightedAverage,	eax				; weightedAverage := EAX
+												; weightedAverage := 70d
 
-	dtoa	outputValue,		eax				; Interpolate weightedAverage into outputMessage
+	dtoa	outputValue,		eax				; Convert weightedAverage (70d) into a string ("70")
 	output	outputLabel,		outputValue		; Display the final result to the user
 
 	mov		eax,				0				; exit with return code 0

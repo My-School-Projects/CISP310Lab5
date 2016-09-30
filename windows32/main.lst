@@ -1,4 +1,4 @@
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:27:43
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:43:11
 main.asm						     Page 1 - 1
 
 
@@ -165,39 +165,55 @@ main.asm						     Page 1 - 1
  000001C8  A1 00000000 R		mov		eax,				grade1
  000001CD  F7 25 00000010 R		mul		weight1
  000001D3  A3 00000020 R		mov		weightedGrade1,		eax				; weightedGrade1 := grade1 * weight1
-																; weightedGrade1 := 43 * 40 (1720)
+																; weightedGrade1 := 43d * 40d (= 1720d)
 
  000001D8  A1 00000004 R		mov		eax,				grade2
  000001DD  F7 25 00000014 R		mul		weight2
  000001E3  A3 00000024 R		mov		weightedGrade2,	 eax				; weightedGrade2 := grade2 * weight2
+																; weightedGrade2 := 76d * 20d (= 1520d)
 
  000001E8  A1 00000008 R		mov		eax,				grade3
  000001ED  F7 25 00000018 R		mul		weight3
  000001F3  A3 00000028 R		mov		weightedGrade3,		eax				; weightedGrade3 := grade3 * weight3
+																; weightedGrade3 := 87d * 30d (= 2610d)
 
  000001F8  A1 0000000C R		mov		eax,				grade4
  000001FD  F7 25 0000001C R		mul		weight4
  00000203  A3 0000002C R		mov		weightedGrade4,		eax				; weightedGrade4 := grade4 * weight4
+																; weightedGrade4 := 82d * 40d (= 3280d)
 
  00000208  A1 00000020 R		mov		eax,				weightedGrade1	; EAX := weightedGrade1
+																; EAX := 1720d
  0000020D  03 05 00000024 R		add		eax,				weightedGrade2	; EAX := weightedGrade1 + weightedGrade2
+																; EAX := 3240d
  00000213  03 05 00000028 R		add		eax,				weightedGrade3	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3
+																; EAX := 5850d
  00000219  03 05 0000002C R		add		eax,				weightedGrade4	; EAX := weightedGrade1 + weightedGrade2 + weightedGrade3 + weightedGrade4
+																; EAX := 9130d
  0000021F  A3 00000030 R		mov		weightedSum,		eax				; weightedSum := EAX
+																; weightedSum := 9130d
 
  00000224  A1 00000010 R		mov		eax,				weight1			; EAX := weight1
+																; EAX := 40d
  00000229  03 05 00000014 R		add		eax,				weight2			; EAX := weight1 + weight2
+																; EAX := 40d + 20d (= 60d)
  0000022F  03 05 00000018 R		add		eax,				weight3			; EAX := weight1 + weight2 + weight3
+																; EAX := 40d + 20d + 30d (= 90d)
  00000235  03 05 0000001C R		add		eax,				weight4			; EAX := weight1 + weight2 + weight3 + weight4
+																; EAX := 40d + 20d + 30d + 40d (= 130d)
  0000023B  A3 00000034 R		mov		sumOfWeights,		eax				; sumOfWeights := EAX
+																; sumOfWeights := 130d
 
 					; Division by a DWORD requires the dividend to be stored in EDX:EAX
  00000240  BA 00000000			mov		edx,				0				; EDX := 0 (our dividend is only 32 bits - only the lower order bits are used)
  00000245  A1 00000030 R		mov		eax,				weightedSum		; EAX := weightedSum
+																; EAX := 9130d
  0000024A  F7 35 00000034 R		div		sumOfWeights						; EAX := weightedSum / sumOfWeights
+																; EAX := 9130d / 130d (= 70d)
  00000250  A3 00000038 R		mov		weightedAverage,	eax				; weightedAverage := EAX
+																; weightedAverage := 70d
 
-					dtoa	outputValue,		eax				; Interpolate weightedAverage into outputMessage
+					dtoa	outputValue,		eax				; Convert weightedAverage (70d) into a string ("70")
 					output	outputLabel,		outputValue		; Display the final result to the user
 
  00000286  B8 00000000			mov		eax,				0				; exit with return code 0
@@ -206,7 +222,7 @@ main.asm						     Page 1 - 1
  0000028C			_MainProc ENDP
 
 				END   ; end of source code
-Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:27:43
+Microsoft (R) Macro Assembler Version 11.00.61030.0	    09/29/16 18:43:11
 main.asm						     Symbols 2 - 1
 
 
