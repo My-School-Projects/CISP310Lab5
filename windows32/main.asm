@@ -10,8 +10,7 @@ INCLUDE io.h   ; header file for input/output
 	; The purpose of this program is to find the weighted average of 4 grades,
 	; each with an independent weight.
 
-	; We will be using DWORDS, because scores of more than 65535 (2^16 - 1) seem reasonable,
-	; and scores of more than 4294967295 (2^32 - 1) do not.
+	; We will be using DWORDS, because the problem spec said to.
 	; We will treat all values as unsigned integers, because this problem does not involve
 	; any negative numbers.
 	
@@ -52,17 +51,26 @@ INCLUDE io.h   ; header file for input/output
 	; depending on the iteration.
 
 	gradePrompt		BYTE	"Grade "	; Stays constant
-	gradeNumber		BYTE	"X"			; "X" will be replaced with a number at runtime
+	gradeNumber		BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
 					BYTE	":", 0		; Stays constant - null terminated
 
 	weightPrompt	BYTE	"Weight "	; Stays constant
-	weightNumber	BYTE	"X"			; "X" will be replaced with a number at runtime
+	weightNumber	BYTE	"X"			; "X" will be replaced with a ASCII coded digit at runtime
 					BYTE	":", 0		; Stays constant - null terminated
 
 	; The input macro needs a 40 character string to store data in
 
 	string			BYTE	40	DUP	(0)
-	
+
+	; The output macro needs a C-string (null-terminated string) to display as a label,
+	; and a C-string to display as a message.
+
+	; outputValue will be replaced at runtime with an 11 character string which will hold the decimal
+	; value of weightedAverage
+
+	outputLabel		BYTE	"Weighted Average:", 0	; Label to be displayed upon output
+	outputValue		BYTE	11	DUP	("X")			; Space for result of dtoa (11 ASCII coded bytes)
+					BYTE	0						; Null string terminator
 
 .CODE
 _MainProc PROC
@@ -71,6 +79,7 @@ _MainProc PROC
 
 	mov		gradeNumber,		"1"			; Set gradePrompt to "Grade 1:"
 	mov		weightNumber,		"1"			; Set weightPrompt to "Weight 1:"
+
 
 	input	gradePrompt,		string,	40	; Display prompt, string := user input (as string)
 	atod	string							; EAX := user input (as integer)
@@ -82,7 +91,7 @@ _MainProc PROC
 
 	; Repeat the same steps as above for grades 2, 3 and 4
 
-	; Get grade2 and weight2
+	; Get grade2 and weight2 (same as grade1)
 
 	mov		gradeNumber,		"2"			; Set gradePrompt to "Grade 2:"
 	mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
@@ -156,6 +165,9 @@ _MainProc PROC
 	mov		eax,				weightedSum		; EAX := weightedSum
 	div		sumOfWeights						; EAX := weightedSum / sumOfWeights
 	mov		weightedAverage,	eax				; weightedAverage := EAX
+
+	dtoa	outputValue,		eax				; Interpolate weightedAverage into outputMessage
+	output	outputLabel,		outputValue		; Display the final result to the user
 
 	mov		eax,				0				; exit with return code 0
 	
