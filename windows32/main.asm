@@ -84,7 +84,7 @@ _MainProc PROC
 
 	; Get grade2 and weight2
 
-	mov		gradeNumber,		"2"			; Set prompt to "Grade 2:"
+	mov		gradeNumber,		"2"			; Set gradePrompt to "Grade 2:"
 	mov		weightNumber,		"2"			; Set weightPrompt to "Weight 2:"
 										
 	input	gradePrompt,		string,	40
